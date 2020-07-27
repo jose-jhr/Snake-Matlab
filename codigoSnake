@@ -1,0 +1,245 @@
+%%Ingenieria JHR
+a = figure('KeyPressFcn',@interrupcion,'name','meausered_data','position',[200,50,600,600]);%% xi y xf 
+a.Color = [0 0 0]
+
+
+puntaje = uicontrol(a,'Style','text',...
+    'String','Select a data set.',...
+    'Position',[460 560 130 30]);
+puntaje.String = 'hello World';
+
+
+
+cabezaPos = uicontrol(a,'Style','text',...
+    'String','Select a data set.',...
+    'Position',[460 450 130 100]);
+cabezaPos.String = 'hello World';
+
+matrizR = uicontrol(a,'Style','text',...
+    'String','Select a data set.',...
+    'Position',[460 340 130 100]);
+matrizR.String = 'hello World';
+
+%set(h1,'Position',[10 00 1200 600])
+tam_cas = 10;
+global axis;
+axis = axes;
+axis.GridAlpha = 0.5
+axis.Color = 'white'
+axis.XLim = [0,300]
+axis.YLim = [0,300]
+
+set (axis,'position',[0.05 0.28 0.7 0.7])
+grid on
+grid minor
+% axis([0 200 0 200])
+
+
+
+global posxSnake
+global posySnake
+global cantComida;
+cantComida = 1;
+global valser;
+valser = 0;
+
+posxSnake =java.util.ArrayList()
+posySnake =java.util.ArrayList()
+global dx ;
+global dy
+dx = [-1 1 0 0];
+dy = [0 0 -1 1];
+
+posxSnake.add(10);
+posySnake.add(10);
+
+global randomX;
+global randomY;
+randomX = 90;
+randomY = 90;
+global j;
+j = 0;
+global puntos;
+puntos  = 0;
+global cola;
+global colan;
+
+%tamaño max de la cola
+colan = zeros(1,200);
+global dir;
+
+%%matriz tamaño de la cola
+for i = 1:length(colan)
+   colan(i) = rectangle('Position',[-10 -10 tam_cas tam_cas],'FaceColor', 'black');
+end
+
+dir = 2;
+global snakeD;
+global comida;
+
+cola = rectangle('Position',[randomX randomY tam_cas tam_cas],'FaceColor', 'r');
+comida = rectangle('Position',[randomX randomY tam_cas tam_cas],'FaceColor', 'w');
+snakeD = rectangle('Position',[randomX randomY tam_cas tam_cas],'FaceColor', 'r');
+
+
+while true
+   
+     endAxis();
+            posxSnake.add(0,(posxSnake.get(0)+dx(dir)))
+            posySnake.add(0,(posySnake.get(0)+dy(dir)))
+            
+            s = num2str(cantComida)
+            xCabeza = num2str(posxSnake.get(0))
+            yCabeza = num2str(posySnake.get(0))
+            
+            k = ['Cabeza coordenadas',newline,'x = ',xCabeza,newline,'y = ',yCabeza,newline,...
+                newline,'Posicion comida',newline,'x = ',num2str(randomX),newline,'y = ',num2str(randomY),...
+                newline,newline];
+           
+            puntaje.String = strcat('Puntaje = ',s);
+
+            set(comida,'Position',[randomX randomY tam_cas tam_cas],'FaceColor', 'g');
+            set(snakeD,'Position',[(posxSnake.get(0))*10 (posySnake.get(0))*10 10 10],'FaceColor', 'y');
+            set(cola,'Position',[(posxSnake.get(1))*10 (posySnake.get(1))*10 10 10],'FaceColor', 'r')
+       
+
+             if(cantComida > 1)
+                    colision();
+                    for l = 2:(cantComida)
+                    set(colan(l),'Position',[ (posxSnake.get(l))*10 (posySnake.get(l))*10 10 10],'FaceColor', 'r')
+                    end
+             end
+             
+            newComida();
+            pause(0.09)
+            cabezaPos.String = strcat(k);
+
+             
+    
+end
+
+ function colision()
+    global posxSnake;
+    global posySnake;
+    global cantComida;
+    global colan;
+    
+    for(k = 2:(cantComida))
+        if(posxSnake.get(0) == posxSnake.get(k) && posySnake.get(0) == posySnake.get(k))
+            fprintf('muerto');
+            %si hay colision se envia la cola lejos
+            for l = 1:(cantComida)
+             set(colan(l),'Position',[ (posxSnake.get(l))*-500 (posySnake.get(l))*-500 10 10],'FaceColor', 'r')
+            end
+            cantComida = 1;
+            break;
+        end
+    end
+        
+ end
+ 
+ function interrupcion(splooge,event)
+   global moveY;
+   global moveX;
+   global snakeD;
+   global dir;
+%    dx = [-1 1 0 0];
+%    dy = [0 0 -1 1];
+  switch event.Character
+      case 30
+          if(dir~=3)
+            pause(0.05)
+            dir = 4  
+          end
+      case 31
+          if(dir~=4)
+            pause(0.05)
+            dir = 3  
+          end
+
+      case 29 
+          if(dir~=1)
+             pause(0.05)
+             dir = 2
+          end
+      case 28 
+          if(dir~=2)
+            pause(0.05)
+            dir = 1  
+          end
+
+  end 
+ end
+    
+ function endAxis()
+    global posxSnake;
+    global posySnake;
+    global dir
+    
+    posxSnake.get(0);
+    
+    if (posxSnake.get(0)*10==290 && dir == 2)
+          posxSnake.add(0,-1);
+          pared();
+    end
+    if (posxSnake.get(0)*10==0 && dir ==1)
+        posxSnake.add(0,30);
+        pared();
+    end
+    if (posySnake.get(0)*10==290 && dir == 4)
+          posySnake.add(0,-1);
+          pared();
+    end
+   if (posySnake.get(0)*10==0 && dir ==3)
+        posySnake.add(0,30);
+        pared();
+    end
+    
+ end
+ 
+ function newComida()
+    global randomX;
+    global randomY;
+    global comida;
+    global posxSnake;
+    global posySnake;
+    global cantComida;
+    global puntos;
+    
+  
+    if posxSnake.get(0)*10 == randomX  &&  posySnake.get(0)*10 == randomY
+             randomX = (randi([0 19]))*10;
+             randomY = (randi([0 19]))*10;
+             k = 0;
+             while k<(cantComida)
+                if(randomX == posxSnake.get(k)*10 && randomY == posySnake.get(k)*10)
+                     randomX = (randi([0 19]))*10;
+                     randomY = (randi([0 19]))*10;
+                     k = 0;
+                else
+                    k = k+1
+                end
+            end
+        
+             
+             set(comida,'Position',[randomX randomY 10 10],'FaceColor', 'g');
+             cantComida =cantComida+1;
+             puntos = puntos +1;
+    end
+ end
+
+ function pared()
+ global posxSnake;
+ global posySnake;
+ global cantComida;
+ global colan;
+ 
+            fprintf('muerto');
+            for l = 1:(cantComida)
+            set(colan(l),'Position',[ (posxSnake.get(l))*-500 (posySnake.get(l))*-500 10 10],'FaceColor', 'r')
+            end
+            cantComida = 1;
+      
+ end
+
+
