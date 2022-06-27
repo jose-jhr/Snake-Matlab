@@ -1,7 +1,4 @@
 ```
-
-```
-
 %%Ingenieria JHR
 a = figure('KeyPressFcn',@interrupcion,'name','meausered_data','position',[200,50,600,600]);%% xi y xf 
 a.Color = [0 0 0]
@@ -245,5 +242,8 @@ end
             cantComida = 1;
       
  end
+
+
+```
 
 
